@@ -1,1 +1,1 @@
-### course for big data/hadoop/hdfs ###
+### Project Course on Big Data/Hadoop/HDFS ###
