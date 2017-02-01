@@ -17,6 +17,8 @@ LanguageModel {
 		@Override
 		public void setup(Context context) {
 			// how to get the threashold parameter from the configuration?
+			Configuration c = context.getConfiguration();
+			this.threashold = c.getInt("threashold", 20);
 		}
 
 		
@@ -35,16 +37,19 @@ LanguageModel {
 			
 			String[] words = wordsPlusCount[0].split("\\s+");
 			int count = Integer.valueOf(wordsPlusCount[1]);
+			if (count < this.threashold) return;
 
-
-			//how to filter the n-gram lower than threashold
-			
 			//this is --> cool = 20
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < words.length-1; i++) {
+				sb.append(words[i]).append(" ");
+			}
+			String oKey = sb.toString().trim();
+			String oValue = words[words.length-1];
 
-			//what is the outputkey?
-			//what is the outputvalue?
-			
-			//write key-value to reducer?
+			if(!((oKey == null) || (oKey.length() <1))) {
+				context.write(new Text(oKey), new Text(oValue + "=" + count));
+			}
 		}
 	}
 
@@ -60,8 +65,33 @@ LanguageModel {
 
 		@Override
 		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-			
-			//can you use priorityQueue to rank topN n-gram, then write out to hdfs?
+			TreeMap<Integer, List<String>> tm = new TreeMap<Integer, List<String>>(Collections.reverseOrder());
+
+			for(Text val: values) {
+				String cur = val.toString().trim();
+				String word = cur.split("=")[0].trim();
+				int count = Integer.parseInt(cur.split("=")[1].trim());
+				if(tm.containsKey(count)) {
+					tm.get(count).add(word);
+				}
+				else {
+					List<String> list = new ArrayList<String>();
+					list.add(word);
+					tm.put(count, list);
+				}
+			}
+
+			//format: <50, <girl, bird>> <60, <boy...>>
+			Iterator<Integer> iter = tm.keySet().iterator();
+			for(int j=0; iter.hasNext() && j<n; ) {
+				int keyCount = iter.next();
+				List<String> words = tm.get(keyCount);
+				for(String w: words) {
+					context.write(new DBOutputWritable(key.toString(), w, keyCount),NullWritable.get());
+					j++;
+				}
+			}
+
 		}
 	}
 }

@@ -49,7 +49,7 @@ public class Driver {
 		
 		DBConfiguration.configureDB(conf2, 
 				"com.mysql.jdbc.Driver",
-				"jdbc:mysql://ip_address:port/test",
+				"jdbc:mysql://11.1.1.11:port/test",
 				"root",
 				"password");
 		
