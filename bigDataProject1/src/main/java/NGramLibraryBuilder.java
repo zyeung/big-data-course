@@ -14,7 +14,8 @@ public class NGramLibraryBuilder {
 		int noGram;
 		@Override
 		public void setup(Context context) {
-			//how to get n-gram from command line?
+			Configuration c = context.getConfiguration();
+			this.noGram = c.getInt("noGram", 5);
 		}
 
 		// map method
@@ -24,12 +25,21 @@ public class NGramLibraryBuilder {
 			String line = value.toString();
 			
 			line = line.trim().toLowerCase();
+			String[] words = line.split("\\s+"); //split by ' ', '\t'...ect
+			if(words.length<2) return;
 
-			//how to remove useless elements?
-			
-			//how to separate word by space?
-			
-			//how to build n-gram based on array of words?
+			//this is cool
+			StringBuilder sb;
+			for(int i = 0; i < words.length-1; i++) {
+				sb = new StringBuilder();
+				sb.append(words[i]);
+				for(int j=1; i+j<words.length && j<noGram; j++) {
+					sb.append(" ");
+					sb.append(words[i+j]);
+					context.write(new Text(sb.toString().trim()), new IntWritable(1));
+				}
+			}
+
 		}
 	}
 
@@ -39,7 +49,11 @@ public class NGramLibraryBuilder {
 		public void reduce(Text key, Iterable<IntWritable> values, Context context)
 				throws IOException, InterruptedException {
 
-			//how to sum up the total count for each n-gram?
+			int sum = 0;
+			for(IntWritable value: values) {
+				sum += value.get();
+			}
+			context.write(key, new IntWritable(sum));
 		}
 	}
 
