@@ -43,6 +43,9 @@ public class UnitMultiplication {
 
             //input format: Page\t PageRank
             //target: write to reducer
+            String[] pr = value.toString().trim().split("\t");
+            context.write(new Text(pr[0]), new Text(pr[1]));
+
         }
     }
 
@@ -55,6 +58,7 @@ public class UnitMultiplication {
 
             //input key = fromPage value=<toPage=probability..., pageRank>
             //target: get the unit multiplication
+
         }
     }
 
