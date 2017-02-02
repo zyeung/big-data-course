@@ -22,6 +22,17 @@ public class UnitMultiplication {
 
             //input format: fromPage\t toPage1,toPage2,toPage3
             //target: build transition matrix unit -> fromPage\t toPage=probability
+            String line = value.toString().trim();
+            String[] fromTo = line.split("\t");
+
+            if(fromTo.length == 1 || fromTo[1].trim().equals("")) {
+                return;
+            }
+            String from = fromTo[0];
+            String[] tos = fromTo[1].split(",");
+            for (String to: tos) {
+                context.write(new Text(from), new Text(to + "=" + (double)1/tos.length));
+            }
         }
     }
 
