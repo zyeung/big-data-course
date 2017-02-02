@@ -8,6 +8,7 @@ import org.apache.hadoop.mapreduce.lib.chain.ChainMapper;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.yarn.webapp.hamlet.HamletSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,7 +59,22 @@ public class UnitMultiplication {
 
             //input key = fromPage value=<toPage=probability..., pageRank>
             //target: get the unit multiplication
+            List<String> transUnit = new ArrayList<String>();
+            double probUnit = 0;
+            for (Text value: values){
+                if (value.toString().contains("=")){
+                    transUnit.add(value.toString());
+                }else{
+                    probUnit = Double.parseDouble(value.toString());
+                }
+            }
 
+            for (String unit: transUnit){
+                String opKey = unit.split("=")[0];
+                double p = Double.parseDouble(unit.split("=")[1]);
+                String opValue = String.valueOf(p*probUnit);
+                context.write(new Text(opKey), new Text(opValue));
+            }
         }
     }
 
