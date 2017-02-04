@@ -19,6 +19,9 @@ public class UnitSum {
 
             //input format: toPage\t unitMultiplication
             //target: pass to reducer
+            String[] pRank = value.toString().split("\t");
+            double subRank = Double.parseDouble(pRank[1]);
+            context.write(new Text(pRank[0]),new DoubleWritable(subRank));
         }
     }
 
@@ -29,7 +32,14 @@ public class UnitSum {
                 throws IOException, InterruptedException {
 
            //input key = toPage value = <unitMultiplication>
-            //target: sum!
+            //target: sum
+            double sum = 0.0;
+            for (DoubleWritable v : values){
+                sum += v.get();
+            }
+            DecimalFormat df = new DecimalFormat("#.000");
+            sum = Double.valueOf(df.format(sum));
+            context.write(key, new DoubleWritable(sum));
         }
     }
 
