@@ -2,5 +2,5 @@
 **Project Description:**
 - Project0: Word count, Maven environment configuration
 - Project1: Distributed text indexing system
-- Project2: Hadoop powered search engine
+- Project2: Hadoop powered big table & search engine
 - Project3: Recommendation system
